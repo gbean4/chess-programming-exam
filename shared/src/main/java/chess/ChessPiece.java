@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -10,7 +12,12 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
 
     /**
@@ -29,14 +36,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return this.pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
 
     /**
@@ -47,6 +54,31 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessRules Rule = new ChessRules(board);
+        if (board.getPiece(myPosition).getPieceType()== PieceType.BISHOP){
+            return Rule.getSlidingMoves(myPosition, new int[][]{{1,1}, {-1,1}, {1,-1}, {-1,-1}});
+        } else if (board.getPiece(myPosition).getPieceType()== PieceType.ROOK){
+            return Rule.getSlidingMoves(myPosition, new int[][]{{1,0}, {-1,0}, {0,-1}, {0,1}});
+        } else if (board.getPiece(myPosition).getPieceType()== PieceType.QUEEN ||
+                board.getPiece(myPosition).getPieceType()== PieceType.KING){
+            return Rule.getSlidingMoves(myPosition, new int[][]{{1,1}, {-1,1}, {1,-1}, {-1,-1}, {1,0}, {-1,0}, {0,-1}, {0,1}});
+        } else if (board.getPiece(myPosition).getPieceType()== PieceType.KNIGHT){
+            return Rule.getSlidingMoves(myPosition, new int[][]{{1,2}, {-1,2}, {1,-2}, {-1,-2}, {2,1}, {-2,1}, {2,-1}, {-2,-1}});
+        } else{
+            return Rule.getPawnMoves(myPosition);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ChessPiece that)) {
+            return false;
+        }
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
